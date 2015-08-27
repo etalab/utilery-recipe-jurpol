@@ -1,3 +1,4 @@
+name: tgi
 buffer: 16
 srid: 3857
 layers:
