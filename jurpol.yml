@@ -35,7 +35,7 @@ layers:
       maxzoom: 20
       sql: |-
         SELECT
-          st_SimplifyPreserveTopology(st_union(c.geom),!pixel_width!) AS way, p.institution, regexp_replace(regexp_replace(regexp_replace(regexp_replace(service,'Brigade de proximit.','BP '),'Brigade territoriale autonome','BT'),'Commissariat de police','Comm.'),'-',' ','g') as service
+          st_SimplifyPreserveTopology(st_union(c.geom),!pixel_width!/2) AS way, p.institution, regexp_replace(regexp_replace(regexp_replace(regexp_replace(service,'Brigade de proximit.','BP '),'Brigade territoriale autonome','BT'),'Commissariat de police','Comm.'),'-',' ','g') as service
         FROM
           communes c
         JOIN
@@ -44,4 +44,16 @@ layers:
           c.geom && !bbox!
         GROUP BY
           institution,service
+- name: zonage_communes
+  clip: false
+  queries:
+    - minzoom: 13
+      maxzoom: 20
+      sql: |-
+        SELECT
+          ST_SimplifyPreserveTopology(c.geom,!pixel_width!/2) AS way, nom, insee
+        FROM
+          communes c
+        WHERE
+          c.geom && !bbox!
 
