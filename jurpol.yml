@@ -6,7 +6,15 @@ layers:
   clip: true
   buffer: 8
   queries:
-    - minzoom: 6
+    - minzoom: 5
+      maxzoom: 9
+      sql: |-
+        SELECT
+          ST_MakeValid(st_SimplifyPreserveTopology(geom,!pixel_width!/2)) AS way, nom, regexp_replace(regexp_replace(osm_nom,'^[1-9].*','Paris'),'[1-9].*','') as osm_nom, couleur::int as couleur
+        FROM
+          zonage_tgi
+        WHERE geom && !bbox!
+    - minzoom: 10
       maxzoom: 20
       sql: |-
         SELECT
@@ -35,7 +43,7 @@ layers:
       maxzoom: 20
       sql: |-
         SELECT
-          st_SimplifyPreserveTopology(st_union(c.geom),!pixel_width!/2) AS way, p.institution, regexp_replace(regexp_replace(regexp_replace(regexp_replace(service,'Brigade de proximit.','BP '),'Brigade territoriale autonome','BT'),'Commissariat de police','Comm.'),'-',' ','g') as service
+          ST_MakeValid(st_SimplifyPreserveTopology(st_union(c.geom),!pixel_width!/2)) AS way, p.institution, regexp_replace(regexp_replace(regexp_replace(regexp_replace(service,'Brigade de proximit.','BP '),'Brigade territoriale autonome','BT'),'Commissariat de police','Comm.'),'-',' ','g') as service
         FROM
           communes c
         JOIN
